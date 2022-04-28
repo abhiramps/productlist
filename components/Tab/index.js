@@ -1,5 +1,5 @@
-import { Card, Tabs, AppProvider, Badge } from "@shopify/polaris";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { Card, Tabs, AppProvider } from "@shopify/polaris";
+import { useCallback, useContext, useState } from "react";
 
 import { ProductContext } from "../../context/productContext";
 
@@ -37,37 +37,7 @@ const Tab = () => {
         },
     ];
 
-    useEffect(() => {
-        convertFn();
-    }, [])
-
-    const convertFn = useCallback(
-        () => {
-            var convertedData = [];
-
-            var statusArr = ["active", "draft", "archived"]
-            var inventoryArr = [-71, -3, 1780, 1669, -160, 959, 'inventory not tracked']
-            var typeArr = ['outdore', 'indore']
-            var vendorArr = ['company 123', 'boring bock', 'rustic ltd', 'Partners-demo']
-
-            //random items
-            const random = (array) => array[Math.floor(Math.random() * array.length)];
-
-            const newData = dataArr.map(itm => {
-                return {
-                    ...itm,
-                    "status": random(statusArr),
-                    "inventory": random(inventoryArr),
-                    "type": random(typeArr),
-                    "vendor": random(vendorArr)
-                }
-                // return randomStatus()
-            })
-            // console.log("newData", newData)
-            setData(newData);
-        },
-        [dataArr],
-    )
+   
 
     const onActiveChange = () => {
         const filteredItem = dataArr
