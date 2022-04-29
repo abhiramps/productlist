@@ -1,7 +1,6 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Card, ChoiceList, DataTable, Filters } from '@shopify/polaris';
 import Image from 'next/image';
-import { ProductContext } from '../../context/productContext';
 
 
 export default function FiltersComponent({ dataArr }) {
@@ -14,7 +13,7 @@ export default function FiltersComponent({ dataArr }) {
   const [vendor, setVendor] = useState(null);
   const [queryValue, setQueryValue] = useState(null);
 
-  const [Data, setData] = useState([])
+  const [newTableData, setNewTableData] = useState()
 
   const handlePurchaiseAvailabilityChange = useCallback(
     (value) => setPurchaiseAvailability(value),
@@ -32,10 +31,12 @@ export default function FiltersComponent({ dataArr }) {
     (value) => setQueryValue(value),
     [],
   );
+
   const handlepurchaiseAvailabilityRemove = useCallback(() => setPurchaiseAvailability(null), []);
   const handleProductTypeRemove = useCallback(() => setProductType(null), []);
   const handlevendorRemove = useCallback(() => setVendor(null), []);
   const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
+
   const handleFiltersClearAll = useCallback(() => {
     handlepurchaiseAvailabilityRemove();
     handleProductTypeRemove();
@@ -47,22 +48,6 @@ export default function FiltersComponent({ dataArr }) {
     handleProductTypeRemove,
     handlevendorRemove,
   ]);
-
-
-  // const data = [
-  //   {
-  //     "id": 1,
-  //     "title": "Fjallraven",
-  //     "price": 109.95,
-  //     "description": "Your perfect",
-  //     "category": "men's clothing",
-  //     "image": "https://fakestoreapi",
-  //     "rating": {
-  //       "rate": 3.9,
-  //       "count": 120
-  //     }
-  //   }
-  // ]
 
   // console.log("context data", data);
 
@@ -151,97 +136,59 @@ export default function FiltersComponent({ dataArr }) {
     });
   }
 
-  // const dataArr = [
-  //   ['Emerald Silk Gown', '$875.00', 124689, 140, '$122,500.00'],
-  //   ['Mauve Cashmere Scarf', '$230.00', 124533, 83, '$19,090.00'],
-  //   ['Navy Merino Wool', '$445.00', 124518, 32, '$14,240.00'],
-  // ]
-
-  // const dataArr = [
-  //   {
-  //     "id": 1,
-  //     // "status": "active",
-  //     // "inventory": 100,
-  //     // "type": "outdore",
-  //     // "vendor": "company 123",
-  //     "title": "Fjallraven",
-  //     "price": 109.95,
-  //     "description": "Your perfect",
-  //     "category": "men's clothing",
-  //     "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-  //     "rating": {
-  //       "rate": 3.9,
-  //       "count": 120
-  //     }
-  //   },
-  //   {
-  //     "id": 2,
-  //     // "status": "Draft",
-  //     // "inventory": 200,
-  //     // "type": "indore",
-  //     // "vendor": "company 456",
-  //     "title": "abc",
-  //     "price": 109.95,
-  //     "description": "Your perfect",
-  //     "category": "men's clothing",
-  //     "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-  //     "rating": {
-  //       "rate": 3.9,
-  //       "count": 120
-  //     }
-  //   }
-  // ]
-
   useEffect(() => {
-    convertFn();
-  }, [])
+    searchfilter()
+  }, [queryValue])
 
-  const convertFn = useCallback(
-    () => {
-      var convertedData = [];
+  const searchfilter = useCallback(() => {
+    if (queryValue !== '') {
+      var results = dataArr
+        .filter((item) => {
+          return Object.values(item)
+            .join(' ')
+            .toLowerCase()
+            .includes(queryValue?.toLowerCase());
+        })
+    }
+    // console.log("results", results)
+    setNewTableData(results)
+  }, [queryValue, setNewTableData, dataArr])
 
-      var statusArr = ["active", "draft", "archived"]
-      var inventoryArr = [-71, -3, 1780, 1669, -160, 959, 'inventory not tracked']
-      var typeArr = ['outdore', 'indore']
-      var vendorArr = ['company 123', 'boring bock', 'rustic ltd', 'Partners-demo']
+  // useEffect(() => {
+  //   modifiedTableRow();
+  // }, [])
 
-      //random items
-      const random = (array) => array[Math.floor(Math.random() * array.length)];
 
-      const newData = dataArr.map(itm => {
-        return {
-          ...itm,
-          "status": random(statusArr),
-          "inventory": random(inventoryArr),
-          "type": random(typeArr),
-          "vendor": random(vendorArr)
-        }
-        // return randomStatus()
-      })
-      // console.log("newData", newData)
+  //formating table row
+  const modifiedTableRow = (data) => {
+    var convertedData = [];
+    // console.log("data", data)
 
-      for (let item of newData) {
-        // var newObj = { ...newObj, ...payload }
-        var tempArray = [
-          <Image src={item.image}
-            alt="Picture of the author"
-            width={30}
-            height={30}
-          />,
-          <div style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</div>,
-          <Badge status="success">{item.status}</Badge>,
-          item.inventory,
-          item.type,
-          item.vendor
-        ];
-        // console.log("temp arr", tempArray)
-        convertedData = [...convertedData, tempArray]
-      }
-      setData(convertedData);
-    },
-    [Data],
-  )
+    for (let item of (!data ? dataArr : data)) {
+      var tempArray = [
+        <Image src={item.image}
+          alt="Picture of products"
+          key={item.id}
+          width={30}
+          height={30}
+        />,
+        <div key={item.id} style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</div>,
+        <Badge key={item.id} status="success">{item.status}</Badge>,
+        item.inventory < 0 ? <div key={item.id} style={{ color: 'red' }}>{item.inventory}</div> :
+          item.inventory === 'inventory not tracked' ? <div key={item.id} style={{ color: 'gray' }}>{item.inventory}</div> :
+            item.inventory,
+        item.type,
+        item.vendor
+      ];
+      // console.log("temp arr", tempArray)
+      convertedData = [...convertedData, tempArray]
+    }
+    // console.log("convertedData",convertedData)
+    return convertedData
 
+    // setNewTableData(convertedData);
+  }
+  // console.log("newTableData",dataArr)
   return (
     <div style={{ height: '568px' }}>
       <Card>
@@ -257,7 +204,7 @@ export default function FiltersComponent({ dataArr }) {
         </Card.Section>
         <DataTable style={{ flex: '1' }}
           columnContentTypes={[
-            '',
+            'text',
             'text',
             'text',
             'text',
@@ -266,13 +213,13 @@ export default function FiltersComponent({ dataArr }) {
           ]}
           headings={[
             '',
-            'Product',
-            'Status',
-            'Inventory',
-            'Type',
-            'Vendor',
+            <div key='product' style={{ fontWeight: 'bold' }}>Product</div>,
+            <div key='status' style={{ fontWeight: 'bold' }}>Status</div>,
+            <div key='inventory' style={{ fontWeight: 'bold' }}>Inventory</div>,
+            <div key='type' style={{ fontWeight: 'bold' }}>Type</div>,
+            <div key='vendor' style={{ fontWeight: 'bold' }}>Vendor</div>,
           ]}
-          rows={Data}
+          rows={modifiedTableRow(queryValue ? newTableData : dataArr)}
         />
       </Card>
     </div>
@@ -299,5 +246,4 @@ export default function FiltersComponent({ dataArr }) {
     }
   }
 }
-
 

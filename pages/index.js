@@ -11,24 +11,24 @@ export default function Home({ dataArr }) {
   // console.log(data)
   return (
     <>
-      <ProductContext.Provider value={{dataArr}}>
+      <ProductContext.Provider value={{ dataArr }}>
         <Container>
           <Page
             title={'Products'}
             secondaryActions={[
               {
-                content: 'Export',
+                content: <div style={{ fontWeight: 'bold' }}>Export</div>,
                 accessibilityLabel: 'Secondary action label',
                 // onAction: () => alert('Duplicate action'),
               },
               {
-                content: 'import',
+                content: <div style={{ fontWeight: 'bold' }}>import</div>,
                 // onAction: () => alert('View on your store action'),
               },
             ]}
             actionGroups={[
               {
-                title: 'More action',
+                title: <div style={{ fontWeight: 'bold' }}>More action</div>,
                 accessibilityLabel: 'Action group label',
                 actions: [
                   {
@@ -54,20 +54,9 @@ export default function Home({ dataArr }) {
   )
 }
 
-
-// export async function getServerSideProps() {
-//   const res = await fetch(`https://fakestoreapi.com/products`)
-//   const data = await res.json()
-//   console.log(data)
-//   return {
-//     props: { data },
-//   }
-// }
-
 export const getServerSideProps = async () => {
-  const res = await fetch('https://fakestoreapi.com/products')
-  const dataArr = await res.json()
-  // console.log(article)
+  const res = await fetch('https://fakestoreapi.com/products');
+  const dataArr = await res.json();
   return {
     props: {
       dataArr,
