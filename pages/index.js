@@ -2,7 +2,7 @@
 import Container from '../components/Layout/Container'
 
 import { Page } from '@shopify/polaris';
-import Tab from '../components/Tab';
+import Tab from '../components/Table';
 import { ProductContext } from '../context/productContext';
 
 
@@ -55,7 +55,7 @@ export default function Home({ dataArr }) {
 }
 
 export const getServerSideProps = async () => {
-  const res = await fetch('https://fakestoreapi.com/products');
+  const res = await fetch(`https://fakestoreapi.com/products`);
   const dataArr = await res.json();
   return {
     props: {

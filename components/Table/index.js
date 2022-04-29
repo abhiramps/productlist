@@ -1,4 +1,4 @@
-import { Card, Tabs, AppProvider } from "@shopify/polaris";
+import { Card, Tabs, AppProvider, Pagination } from "@shopify/polaris";
 import { useCallback, useContext, useEffect, useState } from "react";
 
 import { ProductContext } from "../../context/productContext";
@@ -6,12 +6,17 @@ import { ProductContext } from "../../context/productContext";
 import FiltersComponent from "./FiltersComponent";
 
 
-const Tab = () => {
+const Table = () => {
     const [Data, setData] = useState([])
 
     const { dataArr } = useContext(ProductContext)
-
     const [selected, setSelected] = useState(0);
+
+    //pagination states
+    const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+
 
     const handleTabChange = useCallback(
         (selectedTabIndex) => setSelected(selectedTabIndex),
@@ -61,7 +66,7 @@ const Tab = () => {
                 }
                 // return randomStatus()
             })
-           
+
             setData(newData);
         },
         [setData, dataArr],
@@ -76,20 +81,44 @@ const Tab = () => {
             item.status === 'Active'
         ))
         // console.log("filteredItem", filteredItem)
-        return filteredItem
+        return currentItems(filteredItem)
+        //  filteredItem
     }
     const onDraftChange = () => {
-        return Data.filter(item => (
+        const filteredItem = Data.filter(item => (
             item.status === 'Draft'
         ))
+        return currentItems(filteredItem)
     }
 
     const onArchiveChange = () => {
-        return Data.filter(item => (
+        const filteredItem = Data.filter(item => (
             item.status === 'Archived'
         ))
+        return currentItems(filteredItem)
     }
+
     // console.log("selected tab", tabs[selected].content)
+
+    //pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const totalPages = Math.ceil(Data.length / itemsPerPage);
+    // console.log('totalPages',totalPages)
+    // Get current Items
+    const currentItems = (Data) => Data.slice(indexOfFirstItem, indexOfLastItem);
+
+    const prviousButton = (prop) => {
+        setCurrentPage(currentPage <= 1 ? currentPage = 1 : currentPage => currentPage - 1)
+        console.log(prop)
+    }
+
+    const nextButton = (prop) => {
+        setCurrentPage(currentPage < totalPages ? currentPage => currentPage + 1 : currentPage = totalPages)
+        console.log(prop)
+    }
+
+    console.log("currentpage",currentPage)
     return (
         <AppProvider>
             <Card>
@@ -101,14 +130,21 @@ const Tab = () => {
                         tabs[selected].content === 'Active' ? <FiltersComponent dataArr={onActiveChange()} /> :
                             tabs[selected].content === 'Draft' ? <FiltersComponent dataArr={onDraftChange()} /> :
                                 tabs[selected].content === 'Archived' ? <FiltersComponent dataArr={onArchiveChange()} /> :
-                                    <FiltersComponent dataArr={Data} />
+                                    <FiltersComponent dataArr={currentItems(Data)} />
                     }
                     {/* <FiltersComponent dataArr={Data} /> */}
                     {/* </Card.Section> */}
+    
+                    <Pagination
+                        hasPrevious
+                        onPrevious={() => { prviousButton('previous') }}
+                        hasNext
+                        onNext={() => { nextButton('next') }}
+                    />
                 </Tabs>
             </Card>
         </AppProvider>
     );
 }
 
-export default Tab;
+export default Table;

@@ -190,7 +190,7 @@ export default function FiltersComponent({ dataArr }) {
   }
   // console.log("newTableData",dataArr)
   return (
-    <div style={{ height: '568px' }}>
+    <div style={{ height: '90vh' }}>
       <Card>
         <Card.Section>
           <Filters
