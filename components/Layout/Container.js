@@ -6,9 +6,10 @@ const Container = ({ children }) => {
         <Fragment>
             <Head>
                 <link rel="icon" href="/favicon.ico" />
-                <meta name="description" content="products list" />
+                <meta name="products list" content="products list" />
+                <title>products list</title>
             </Head>
-            <main className='Container'>
+            <main >
                 {children}
             </main>
         </Fragment>
