@@ -13,7 +13,6 @@ const Table = () => {
     const [selected, setSelected] = useState(0);
 
     //pagination states
-    const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
 
@@ -51,7 +50,7 @@ const Table = () => {
             var statusArr = ["Active", "Draft", "Archived"]
             var inventoryArr = [-71, -3, 1780, 1669, -160, 959, 'inventory not tracked']
             var typeArr = ['Outdore', 'Indore']
-            var vendorArr = ['Company 123', 'Boring bock', 'Rustic ltd', 'Partners-demo']
+            var vendorArr = ['company 123', 'boring bock', 'rustic ltd', 'partners-demo']
 
             //random items
             const random = (array) => array[Math.floor(Math.random() * array.length)];
@@ -64,17 +63,11 @@ const Table = () => {
                     "type": random(typeArr),
                     "vendor": random(vendorArr)
                 }
-                // return randomStatus()
             })
-
             setData(newData);
         },
         [setData, dataArr],
     )
-
-    // const Loading = () => <h1>Loading....</h1>
-
-    // if (!Data) { <Loading /> }
 
     const onActiveChange = () => {
         const filteredItem = Data.filter(item => (
@@ -108,38 +101,29 @@ const Table = () => {
     // Get current Items
     const currentItems = (Data) => Data.slice(indexOfFirstItem, indexOfLastItem);
 
-    const prviousButton = (prop) => {
+    const prviousButton = () => {
         setCurrentPage(currentPage <= 1 ? currentPage = 1 : currentPage => currentPage - 1)
-        console.log(prop)
     }
 
-    const nextButton = (prop) => {
+    const nextButton = () => {
         setCurrentPage(currentPage < totalPages ? currentPage => currentPage + 1 : currentPage = totalPages)
-        console.log(prop)
     }
 
-    console.log("currentpage",currentPage)
     return (
         <AppProvider>
             <Card>
                 <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
-                    {/* <Card.Section
-                        // title={tabs[selected].content}
-                    > */}
                     {
                         tabs[selected].content === 'Active' ? <FiltersComponent dataArr={onActiveChange()} /> :
                             tabs[selected].content === 'Draft' ? <FiltersComponent dataArr={onDraftChange()} /> :
                                 tabs[selected].content === 'Archived' ? <FiltersComponent dataArr={onArchiveChange()} /> :
                                     <FiltersComponent dataArr={currentItems(Data)} />
-                    }
-                    {/* <FiltersComponent dataArr={Data} /> */}
-                    {/* </Card.Section> */}
-    
+                    }                       
                     <Pagination
                         hasPrevious
-                        onPrevious={() => { prviousButton('previous') }}
+                        onPrevious={() => { prviousButton() }}
                         hasNext
-                        onNext={() => { nextButton('next') }}
+                        onNext={() => { nextButton() }}
                     />
                 </Tabs>
             </Card>

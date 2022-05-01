@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Card, ChoiceList, DataTable, Filters } from '@shopify/polaris';
 import Image from 'next/image';
+import searchString from '../../utils/searchString';
+import vendorFiltering from '../../utils/vendorFiltering';
 
 
 export default function FiltersComponent({ dataArr }) {
-
-  //context prop
-  // const { dataArr } = useContext(ProductContext)
 
   const [purchaiseAvailability, setPurchaiseAvailability] = useState(null);
   const [productType, setProductType] = useState(null);
@@ -16,7 +15,7 @@ export default function FiltersComponent({ dataArr }) {
   const [newTableData, setNewTableData] = useState()
 
   const handlePurchaiseAvailabilityChange = useCallback(
-    (value) => setPurchaiseAvailability(value),
+    (value) => { setPurchaiseAvailability(value) },
     [],
   );
   const handleProductTypeChange = useCallback(
@@ -24,7 +23,9 @@ export default function FiltersComponent({ dataArr }) {
     [],
   );
   const handleVendorChange = useCallback(
-    (value) => setVendor(value),
+    (value) => {
+      setVendor(value)
+    },
     [],
   );
   const handleFiltersQueryChange = useCallback(
@@ -49,7 +50,6 @@ export default function FiltersComponent({ dataArr }) {
     handlevendorRemove,
   ]);
 
-  // console.log("context data", data);
 
   const filters = [
     {
@@ -100,7 +100,7 @@ export default function FiltersComponent({ dataArr }) {
             { label: 'Company 123', value: 'company 123' },
             { label: 'Boring Rock', value: 'boring bock' },
             { label: 'Rustic LTD', value: 'rustic ltd' },
-            { label: 'Partners-demo', value: 'Partners-demo' },
+            { label: 'Partners-demo', value: 'partners-demo' },
           ]}
           selected={vendor || []}
           onChange={handleVendorChange}
@@ -138,31 +138,37 @@ export default function FiltersComponent({ dataArr }) {
 
   useEffect(() => {
     searchfilter()
-  }, [queryValue])
+  }, [queryValue, vendor])
 
   const searchfilter = useCallback(() => {
-    if (queryValue !== '') {
-      var results = dataArr
-        .filter((item) => {
-          return Object.values(item)
-            .join(' ')
-            .toLowerCase()
-            .includes(queryValue?.toLowerCase());
-        })
+    //applying both search string and vendor checkbox filtering
+    if (queryValue !== null && vendor !== null) {
+      let result = searchString({ dataArr, queryValue })
+        .filter((item) => vendor.some(category => [item.vendor].flat().includes(category)))
+      setNewTableData(result)
     }
-    // console.log("results", results)
-    setNewTableData(results)
-  }, [queryValue, setNewTableData, dataArr])
+    //applying search string filtering only
+    else if (queryValue !== null) {
+      let result = searchString({ dataArr, queryValue })
+      setNewTableData(result)
+    }
+    //applying vendor checkbox filtering only
+    else if (vendor !== null) {
+      let results = vendorFiltering({dataArr,vendor})
+      setNewTableData(results)
+    }
+    //while no filters are applied
+    else {
+      setNewTableData(dataArr)
+    }
+  }, [queryValue, vendor, dataArr])
 
-  // useEffect(() => {
-  //   modifiedTableRow();
-  // }, [])
 
 
   //formating table row
   const modifiedTableRow = (data) => {
     var convertedData = [];
-    // console.log("data", data)
+
 
     for (let item of (!data ? dataArr : data)) {
       var tempArray = [
@@ -180,15 +186,12 @@ export default function FiltersComponent({ dataArr }) {
         item.type,
         item.vendor
       ];
-      // console.log("temp arr", tempArray)
       convertedData = [...convertedData, tempArray]
     }
-    // console.log("convertedData",convertedData)
     return convertedData
 
-    // setNewTableData(convertedData);
+
   }
-  // console.log("newTableData",dataArr)
   return (
     <div style={{ height: '90vh' }}>
       <Card>
@@ -219,7 +222,7 @@ export default function FiltersComponent({ dataArr }) {
             <div key='type' style={{ fontWeight: 'bold' }}>Type</div>,
             <div key='vendor' style={{ fontWeight: 'bold' }}>Vendor</div>,
           ]}
-          rows={modifiedTableRow(queryValue ? newTableData : dataArr)}
+          rows={modifiedTableRow(queryValue || vendor ? newTableData : dataArr)}
         />
       </Card>
     </div>
